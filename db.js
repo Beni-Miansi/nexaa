@@ -16,6 +16,7 @@ async function getDb() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT NOT NULL UNIQUE,
         password_hash TEXT NOT NULL,
+        display_name TEXT,
         created_at INTEGER NOT NULL
       )`,
       `CREATE TABLE IF NOT EXISTS conversations (
@@ -23,6 +24,7 @@ async function getDb() {
         user_id INTEGER NOT NULL,
         title TEXT,
         created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (user_id) REFERENCES users(id)
       )`,
       `CREATE TABLE IF NOT EXISTS messages (
@@ -37,11 +39,19 @@ async function getDb() {
     "write"
   );
 
-  // Migration : ajouter la colonne title si elle n'existe pas encore
-  try {
-    await client.execute("ALTER TABLE conversations ADD COLUMN title TEXT");
-  } catch (_) {
-    // Colonne déjà présente, on ignore
+  // Migrations : ajouter les colonnes si elles n'existent pas encore
+  const migrations = [
+    "ALTER TABLE conversations ADD COLUMN title TEXT",
+    "ALTER TABLE conversations ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0",
+    "ALTER TABLE users ADD COLUMN display_name TEXT",
+  ];
+
+  for (const sql of migrations) {
+    try {
+      await client.execute(sql);
+    } catch (_) {
+      // Colonne déjà présente, on ignore
+    }
   }
 
   return client;

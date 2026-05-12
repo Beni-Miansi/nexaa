@@ -5,3 +5,10 @@ data/
 cookies.txt
 *.log
 .claude/
+dist/
+public/assets/
+local.db
+*.db
+.vscode/
+BUILD_ANALYSIS_REPORT.md
+QUICK_FIX_GUIDE.md
